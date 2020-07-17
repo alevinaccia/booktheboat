@@ -36,7 +36,6 @@ this.addEventListener('load', () => {
         method: 'GET',
     }).then(response => response.json())
         .then(data => generateList(data))
-    
     registerSW();
 })
 

@@ -2,47 +2,42 @@ const cacheName = 'btb';
 const staticAssets = [
     './',
     './index.html',
-    './main.js',
+    './offline.html',
     './manifest.json',
-    './now.json',
     './style.css'
 ];
 
-this.addEventListener('install', async event => {
-    const cache = await caches.open(cacheName);
-    await cache.addAll(staticAssets);
-    return this.skipWaiting();
+this.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(cacheName)
+            .then((cache) => {
+                return cache.addAll(staticAssets);
+            })
+    )
 });
 
-this.addEventListener('activate', event => {
-    this.clients.claim();
-})
+this.addEventListener('fetch', (event) => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(() => {
+                return fetch(event.request) 
+                    .catch(() => caches.match('offline.html'))
+            })
+    )
+});
 
-this.addEventListener('fetch', async event => {
-    const req = event.request;
-    const url = new URL(req.url);
+this.addEventListener('activate', (event) => {
+    const cacheWhitelist = [];
+    cacheWhitelist.push(cacheName);
 
-    if(url.origin === location.origin){
-        event.respondWith(cacheFirst(req));
-    }else{
-        event.respondWith(networkAndCache(req));
-    }
-})
-
-const cacheFirst = async (req) => {
-    const cache = await caches.open(cacheName);
-    const cached = await cache.match(req);
-    return cached || fetch(req);
-}
-
-const networkAndCache = async (req) => {
-    const cache = await caches.open(cacheName);
-    try {
-        const fresh = await fetch(req)
-        await cache.put(req, fresh.clone());
-        return fresh;
-    } catch (error) {
-        const cached = await cache.match(req);
-        return cached;
-    }
-}
+    event.waitUntil(
+        caches.keys().then((cacheNames) => Promise.all(
+            cacheNames.map((cacheName) => {
+                if(!cacheWhitelist.includes(cacheName)) {
+                    return caches.delete(cacheName);
+                }
+            })
+        ))
+            
+    )
+});
