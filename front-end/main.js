@@ -35,7 +35,9 @@ this.addEventListener('load', () => {
     fetch('https://book-the-boat-api.avinaccia.vercel.app/', {
         method: 'GET',
     }).then(response => response.json())
-        .then(data => generateList(data));
+        .then(data => generateList(data))
+    
+    registerSW();
 })
 
 form.addEventListener('submit', () => {
@@ -136,4 +138,14 @@ const validFormat = (string, hoursOffset) => {
 const convertToIOS = (date) => {
     date.setHours(date.getHours() - 2);
     return date
+}
+
+const registerSW = async () => {
+    if('serviceWorker' in navigator){
+        try {
+            await navigator.serviceWorker.register('./sw.js')
+        } catch (error) {
+            console.log('SW Registration failed')
+        }
+    }
 }
