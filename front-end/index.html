@@ -1,20 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="./style.css">
+    <link rel="apple-touch-icon" href="images\icons\icon-192x192.png">
+    <meta name="theme-color" content="#403d39"/>
+    <meta name="Description" content="Simple app to book the family boat">
     <title>Book the boat</title>
 </head>
+
 <body>
-    <header><h1>Book the boat!</h1></header>
+    <header>
+        <h1>Book the boat!</h1>
+    </header>
+    <p id="removed" class="ux alert alert-warning">Reservation removed!</p>
+    <p id="success" class="ux alert alert-success">Boat succesfully booked</p>
+    <p id="reject" class="ux alert alert-danger">Incorrect code!</p>
+    <p id="notAvailable" class="ux alert alert-warning">The boat at that time isn't available</p>
     <form id="bookForm">
-        <span id="container">
-        <label for="startTime">Start time</label>
-        <input type="datetime-local" name="startTime"id="startTime" step="3600" required><br>
-        <label for="endTime">End time</label>
-        <input type="datetime-local" name="endTime" id="endTime" step="3600" required></span> <br>
-        <span id="btnContainer"><input type="submit" value="Check availability and book!"></span>
+        <span id="startTimeContainer">
+            <label for="startTime">Start time</label>
+            <input type="datetime-local" name="startTime" id="startTime" step="3600" required><br></span>
+        <span id="endTimeContainer">
+            <label for="endTime">End time</label>
+            <input type="datetime-local" name="endTime" id="endTime" step="3600" required></span>
+        <br>
+        <span id="btnContainer">
+            <label class="secret" for="author">Author</label>
+            <select name="author" required>
+                <option value="">Select one</option>
+                <option value="Alessandro">Alessandro</option>
+                <option value="Gianluigi">Gianluigi</option>
+                <option value="Giovanni">Giovanni</option>
+                <option value="Michele">Michele</option>
+                <option value="Myriam">Myriam</option>
+                <option value="Natalia">Natalia</option>
+                <option value="Valentina">Valentina</option>
+            </select>
+            <input type="submit" value="Check availability and book!"></span>
     </form>
 
     <table id="table">
@@ -26,4 +53,5 @@
     </table>
     <script src="main.js"></script>
 </body>
+
 </html>

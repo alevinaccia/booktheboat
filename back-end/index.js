@@ -1,7 +1,7 @@
 const express = require('express');
 const book = require('./book.js')
 require('dotenv').config();
-const PORT = process.env.PORT || 1333;
+const PORT = process.env.PORT || 1337;
 const cors = require('cors');
 const app = express();
 const db = require('monk')(process.env.MONGO_URI);
@@ -23,20 +23,20 @@ const isAvailable = async (book) => {
 
                 if (newBookStartDate.getTime() > compareBookStartDate.getTime() && newBookStartDate.getTime() < compareBookEndDate.getTime()) {
                     bool.push(false);
-                } else if (newBookEndDate.getTime() > compareBookStartDate.getTime() && newBookEndDate.getTime() < compareBookEndDate.getTime() || newBookEndDate.getTime() > compareBookEndDate.getTime()) {
+                } else if (newBookEndDate.getTime() > compareBookStartDate.getTime() && newBookEndDate.getTime() <= compareBookEndDate.getTime()) {
                     bool.push(false);
-                } else if (newBookStartDate.getTime() >= compareBookStartDate.getTime() && newBookEndDate.getTime() >= compareBookEndDate.getTime()) {
+                } else if (newBookStartDate.getTime() >= compareBookStartDate.getTime() && newBookEndDate.getTime() >= compareBookEndDate.getTime() && newBookStartDate.getTime() < compareBookEndDate.getTime()) {
                     bool.push(false);
-                }else if (newBookStartDate.getTime() == compareBookEndDate.getTime()) {
+                } else if (newBookStartDate.getTime() == compareBookEndDate.getTime()) {
                     bool.push(true);
                 } else {
                     bool.push(true);
                 }
             }
-            if(bool.find(element => element == false) != undefined){
+            if (bool.find(element => element == false) != undefined) {
 
                 finalBool = false
-            }else{
+            } else {
 
                 finalBool = true
             }
@@ -52,24 +52,23 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', async (req, res) => {
-    let bookToAdd = new book(req.headers.starttime, req.headers.endtime);
-    if (await isAvailable(bookToAdd)) {
-        collection.insert(bookToAdd).then((book) => {
-            collection.find().then((all) => {
-                res.send(all)
+        let bookToAdd = new book(req.headers.starttime, req.headers.endtime, req.headers.author);
+        if (await isAvailable(bookToAdd)) {
+            collection.insert(bookToAdd).then((book) => {
+                collection.find().then((all) => {
+                    res.send(all)
+                })
             })
-        })
-    } else {
-        res.status(500);
-        res.send({ "message": "I'm sorry, the boat at that time is already booked" })
-    }
+        } else {
+            res.status(500);
+            res.send({ "message": "I'm sorry, the boat at that time is already booked" })
+        }
 })
 
 app.delete('/', (req, res) => {
-    collection.remove({ _id: req.headers.id })
-        .then(collection.find({}).then((docs) => {
-            res.send(docs)
-        }))
+    collection.findOneAndDelete({ _id: req.headers.id }).then(collection.find().then(() => {
+        db.get('bookList').find().then(all => {res.send(all)});
+    }))
 })
 
 app.listen(PORT, () => {

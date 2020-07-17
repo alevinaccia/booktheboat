@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "name": "book-the-boat",
+  "builds": [
+    {
+      "src": "*",
+      "use": "@now/static"
+    }
+  ],
+  "alias": [
+    "book-the-boat"
+  ]
+}

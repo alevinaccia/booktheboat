@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "name": "bookTheBoat",
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@now/node-server"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/.*",
+      "dest": "index.js"
+    }
+  ],
+  "alias": [
+    "bookTheBoat"
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "MONGO_URI": "@mongo_uri",
+    "SECRET_KEY" : "@secret_key"
+  }
+}

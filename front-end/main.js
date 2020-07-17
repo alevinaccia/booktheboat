@@ -32,7 +32,7 @@ this.addEventListener('load', () => {
     form.startTime.setAttribute('value', validFormat(currentDate.toISOString(), 0))
     form.endTime.setAttribute('value', validFormat(currentDate.toISOString(), 1));
     form.endTime.setAttribute('min', validFormat(currentDate.toISOString(), 1));
-    fetch('http://192.168.1.88:1333/', {
+    fetch('https://book-the-boat-api.avinaccia.vercel.app/', {
         method: 'GET',
     }).then(response => response.json())
         .then(data => generateList(data));
@@ -44,37 +44,48 @@ form.addEventListener('submit', () => {
 
     headers.append('startTime', form.startTime.value);
     headers.append('endTime', form.endTime.value);
+    headers.append('author', form.author.value)
 
-    fetch('http://192.168.1.88:1333/', {
+    fetch('https://book-the-boat-api.avinaccia.vercel.app/', {
         method: 'POST',
         headers: headers
     }).then(res => res.json())
         .then(data => {
-            if (data.message != "I'm sorry, the boat at that time is already booked") {
-                generateList(data)
+            if (data.message == "I'm sorry, the boat at that time is already booked") {
+                document.querySelector('#removed').style.display = 'none';
+                document.querySelector('#success').style.display = 'none';
+                document.querySelector('#reject').style.display = 'none';
+                document.querySelector('#notAvailable').style.display = 'block';
             } else {
-                console.log(data);
+                document.querySelector('#removed').style.display = 'none';
+                document.querySelector('#success').style.display = 'block';
+                document.querySelector('#reject').style.display = 'none';
+                document.querySelector('#notAvailable').style.display = 'none';
+                generateList(data);
             }
         })
 })
 
 const deleteReservation = (id) => {
-    fetch('http://192.168.1.88:1333/', {
+    fetch('https://book-the-boat-api.avinaccia.vercel.app/', {
         method: 'DELETE',
         headers: {
             id: id
         }
     }).then(response => response.json())
         .then(data => {
-            console.log(data)
-            generateList(data)
+            document.querySelector('#removed').style.display = 'block';
+            document.querySelector('#success').style.display = 'none';
+            document.querySelector('#reject').style.display = 'none';
+            document.querySelector('#notAvailable').style.display = 'none';
+            generateList(data);
         });
 }
 
 const generateList = list => {
     const arr = Object.values(list);
 
-    arr.sort((a,b) => {
+    arr.sort((a, b) => {
         return new Date(b.startTime) - new Date(a.startTime)
     })
 
@@ -100,11 +111,12 @@ const generateList = list => {
         let td2 = document.createElement('td');
         td2.innerText = `${startData.getHours()}:00 - ${endData.getHours()}:00`;
         let td3 = document.createElement('td');
-        td3.innerText = 'test';
+        td3.innerText = arr[i].creator;
         let td4 = document.createElement('td');
         btn = document.createElement('button');
         btn.innerText = 'Delete';
         btn.setAttribute('onclick', `deleteReservation('${arr[i]._id}')`);
+        btn.setAttribute('class', 'deleteBTN');
         td4.appendChild(btn);
         tr.appendChild(td1);
         tr.appendChild(td2);
